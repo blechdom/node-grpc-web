@@ -1,0 +1,28 @@
+body {
+    font-family: "Avenir Next", "Avenir", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+    padding: 5em 3em;
+}
+h1,h2,h3,h4,h5,h6 {
+  opacity: 0.6;
+}
+h1 {
+    font-size: 40px;
+}
+h5 {
+}
+.btn:focus,.btn:active:focus,.btn.active:focus,
+.btn.focus,.btn:active.focus,.btn.active.focus {
+    outline: none;
+    box-shadow:none;
+}
+.icon-flash {
+  border: none;
+  display:inline-block;
+
+  animation: blink 2s ease-in infinite;
+}
+
+@keyframes blink {
+  from, to { opacity: 1 }
+  50% { opacity: 0 }
+}
