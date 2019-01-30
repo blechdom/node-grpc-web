@@ -1,11 +1,10 @@
 
 # node-grpc-web
-stop / start docker desktop		
-use protoc to compile proto file	
+stop / start docker desktop
 
-$ protoc -I=. helloworld.proto \
-	--js_out=import_style=commonjs:. \
-	--grpc-web_out=import_style=commonjs,mode=grpcwebtext:.
+use protoc to compile proto file - generates *_grpc_web_pb.js and *_pb.js files	
+
+$ protoc -I=. helloworld.proto \ --js_out=import_style=commonjs:. \ --grpc-web_out=import_style=commonjs,mode=grpcwebtext:.
 	
 install node dependencies	
 
