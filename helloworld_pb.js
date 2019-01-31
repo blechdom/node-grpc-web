@@ -203,8 +203,8 @@ proto.helloworld.RepeatHelloRequest.prototype.toObject = function(opt_includeIns
  */
 proto.helloworld.RepeatHelloRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    name: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    count: jspb.Message.getFieldWithDefault(msg, 2, 0)
+    filepath: jspb.Message.getFieldWithDefault(msg, 1, ""),
+    languagecode: jspb.Message.getFieldWithDefault(msg, 2, "")
   };
 
   if (includeInstance) {
@@ -243,11 +243,11 @@ proto.helloworld.RepeatHelloRequest.deserializeBinaryFromReader = function(msg, 
     switch (field) {
     case 1:
       var value = /** @type {string} */ (reader.readString());
-      msg.setName(value);
+      msg.setFilepath(value);
       break;
     case 2:
-      var value = /** @type {number} */ (reader.readInt32());
-      msg.setCount(value);
+      var value = /** @type {string} */ (reader.readString());
+      msg.setLanguagecode(value);
       break;
     default:
       reader.skipField();
@@ -278,16 +278,16 @@ proto.helloworld.RepeatHelloRequest.prototype.serializeBinary = function() {
  */
 proto.helloworld.RepeatHelloRequest.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
-  f = message.getName();
+  f = message.getFilepath();
   if (f.length > 0) {
     writer.writeString(
       1,
       f
     );
   }
-  f = message.getCount();
-  if (f !== 0) {
-    writer.writeInt32(
+  f = message.getLanguagecode();
+  if (f.length > 0) {
+    writer.writeString(
       2,
       f
     );
@@ -296,32 +296,32 @@ proto.helloworld.RepeatHelloRequest.serializeBinaryToWriter = function(message, 
 
 
 /**
- * optional string name = 1;
+ * optional string filepath = 1;
  * @return {string}
  */
-proto.helloworld.RepeatHelloRequest.prototype.getName = function() {
+proto.helloworld.RepeatHelloRequest.prototype.getFilepath = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
 /** @param {string} value */
-proto.helloworld.RepeatHelloRequest.prototype.setName = function(value) {
+proto.helloworld.RepeatHelloRequest.prototype.setFilepath = function(value) {
   jspb.Message.setProto3StringField(this, 1, value);
 };
 
 
 /**
- * optional int32 count = 2;
- * @return {number}
+ * optional string languagecode = 2;
+ * @return {string}
  */
-proto.helloworld.RepeatHelloRequest.prototype.getCount = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
+proto.helloworld.RepeatHelloRequest.prototype.getLanguagecode = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
 
-/** @param {number} value */
-proto.helloworld.RepeatHelloRequest.prototype.setCount = function(value) {
-  jspb.Message.setProto3IntField(this, 2, value);
+/** @param {string} value */
+proto.helloworld.RepeatHelloRequest.prototype.setLanguagecode = function(value) {
+  jspb.Message.setProto3StringField(this, 2, value);
 };
 
 

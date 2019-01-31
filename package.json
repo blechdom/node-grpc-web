@@ -15,5 +15,8 @@
   "scripts": {
     "start": "node server.js",
     "build": "rm -rf ./dist && npx webpack client.js"
+  },
+  "dependencies": {
+    "@google-cloud/speech": "^2.2.0"
   }
 }
