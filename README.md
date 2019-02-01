@@ -1,56 +1,70 @@
 
 # node-grpc-web
-stop / start docker desktop
 
-use protoc to compile proto file - generates *_grpc_web_pb.js and *_pb.js files	
+REQUIREMENTS:
 
-$ protoc -I=. helloworld.proto \ --js_out=import_style=commonjs:. \ --grpc-web_out=import_style=commonjs,mode=grpcwebtext:.
-	
-install node dependencies	
+docker
 
+npm / NodeJS
+
+protoc
+
+envoy
+
+http-server
+$ npm install -g http-server
+
+google-cloud API key / service JSON
+
+#TO RUN EXAMPLE CODE:
+
+open terminal
+
+Clone Repo
+$ git clone git@github.com:blechdom/node-grpc-web.git
+
+change directory to repo
+$ cd node-grpc-web
+
+make sure Docker is running
+
+build docker envoy proxy
+$ docker build -t node-grpc-web/envoy -f ./envoy.Dockerfile .
+
+run envoy proxy (add --network=host on non-mac machines --- removed for mac)
+$ docker run -d -p 8080:8080 node-grpc-web/envoy
+
+Install node packages
 $ npm install
 
-delete previous webpack main.js build and use webpack to compile client.js
+Build Webpack client (makes dist folder and main.js inside it)
+$ npm run build
 
-$ npm run build	
+Start node server
+$ npm start
 
-was: rm -rf ./dist .            (included as script in package.json)
-was: npx webpack client.js      (included as script in package.json)
+open terminal tab
 
-Run the NodeJS gRPC Service. 
-This listens at port :9090	
+start http server at port 8081
+$ http-server -p 8081
 
-$ npm start	
+go to http://localhost:8081 in browser
 
-was: node server.js		(included as start in package.json)
+#TO EDIT EXAMPLE CODE:
 
-open new terminal		
+if you edit the cloud_speech_web.proto file, you will need to recompile it using protoc
 
-Run the Envoy proxy. 
-The envoy.yaml file configures Envoy to listen to browser requests at port :8080, 
-and forward them to port :9090	
+Protoc will generate two files: cloud_speech_web_grpc_web_pb.js and cloud_speech_web_pb.js files
 
-$ docker build -t helloworld/envoy -f ./envoy.Dockerfile .	
+$ protoc -I=. cloud_speech_web.proto \
+--js_out=import_style=commonjs:. \
+--grpc-web_out=import_style=commonjs,mode=grpcwebtext:.
 
-(made simple edit to envoy.yaml for mac compatibility)
-	
-$ docker run -d -p 8080:8080 helloworld/envoy	
+Since client.js uses these files, you will need to recompile with Webpack
+$ npm run build
 
-(add --network=host on non-mac machines --- removed for mac)
+if you edit server.js, you will need to stop and start the node server:
+ctl-c
+$ npm start
 
-Run a http simple Web Server. 
-This hosts the static file index.html and dist/main.js we generated earlier --> 
-
-using python:	
-
-$ python -m SimpleHTTPServer 8081
-
-OR node:	
-
-$ npm install http-server
-
-$ http-server -p 8081 --cors
-
-go to URL in browser->	
-
-http://127.0.0.1:8081/	
+refresh browser page / clear cache

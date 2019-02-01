@@ -1,10 +1,9 @@
 {
-  "name": "grpc-web-simple-example",
+  "name": "node-grpc-web-cloud-speech-tutorial",
   "version": "0.1.0",
-  "description": "gRPC-Web simple example",
+  "description": "node-grpc-web-cloud-speech-tutorial",
   "devDependencies": {
     "@grpc/proto-loader": "^0.3.0",
-    "async": "^1.5.2",
     "google-protobuf": "^3.6.1",
     "grpc": "^1.15.0",
     "grpc-web": "^1.0.0",
@@ -18,7 +17,6 @@
   },
   "dependencies": {
     "@google-cloud/speech": "^2.2.0",
-    "socket.io": "^2.2.0",
-    "socket.io-stream": "^0.9.1"
+    "socket.io": "^2.2.0"
   }
 }
