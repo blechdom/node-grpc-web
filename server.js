@@ -1,9 +1,11 @@
-var PROTO_PATH = __dirname + '/helloworld.proto';
+var PROTO_PATH = __dirname + '/cloud_speech_web.proto';
+
+const io = require("socket.io");
+//var ss = require('socket.io-stream');
+const SocketServer = io.listen(8082);
 
 var grpc = require('grpc');
 var _ = require('lodash');
-var async = require('async');
-const fs = require('fs');
 const speech = require('@google-cloud/speech');
 var protoLoader = require('@grpc/proto-loader');
 var packageDefinition = protoLoader.loadSync(
@@ -15,64 +17,93 @@ var packageDefinition = protoLoader.loadSync(
      oneofs: true
     });
 var protoDescriptor = grpc.loadPackageDefinition(packageDefinition);
-var helloworld = protoDescriptor.helloworld;
+var cloud_speech_web = protoDescriptor.cloud_speech_web;
 const client = new speech.SpeechClient();
 
-var languageCode = 'en-US'; //en-US get from socket ->
+var languageCode = 'en-US';
 
 const STREAMING_LIMIT = 55000;
-var request = {
-    config: {
-        encoding: 'LINEAR16',
-        sampleRateHertz: 16000,
-        languageCode: languageCode,
-    },
-    interimResults: true
-};
 let recognizeStream = null;
-let restartId;
-/**
- * @param {!Object} call
- * @param {function():?} callback
- */
-function doSayHello(call, callback) {
-  console.log("saying hello");
-  callback(null, {message: 'Hello! '+ call.request.name});
+let restartTimeoutId;
+var audioStreamCall = null;
+
+function doSetLanguageCode(call, callback) {
+  languageCode = call.request.languagecode;
+  callback(null, {message: 'Language code successfully set to '+ languageCode});
 }
 
-/**
- * @param {!Object} call
- */
-function doSayRepeatHello(call) {
-  console.log(call.request.filepath + " " + call.request.languagecode);
-  var senders = [];
-  function sender(filepath, languageCode) {
-    return (callback) => {
-      console.log("repeating hello");
-      call.write({
-        message: 'Audiofile path ' + filepath + ' language code is ' + languageCode
-      });
-      _.delay(callback, 500); // in ms
-    };
-  }
-  for (var i = 0; i < 5; i++) {
-    senders[i] = sender(call.request.filepath + i, call.request.languagecode);
-  }
-  async.series(senders, () => {
-    call.end();
+SocketServer.on("connection", function(socket) {
+
+  socket.on('binaryStream', function(data) {
+    if(recognizeStream!=null) {
+      recognizeStream.write(data);
+    }
   });
+});
+
+function doTranscribeAudioStream(call) {
+  audioStreamCall = call;
+  startStreaming();
 }
 
-/**
- * @return {!Object} gRPC server
- */
+function startStreaming() {
+
+  var request = {
+      config: {
+          encoding: 'LINEAR16',
+          sampleRateHertz: 16000,
+          languageCode: languageCode,
+      },
+      interimResults: true
+  };
+
+  recognizeStream = client
+    .streamingRecognize(request)
+    .on('error', (error) => {
+      console.error;
+    })
+    .on('data', (data) => {
+      if (data.results[0] && data.results[0].alternatives[0]){
+        process.stdout.clearLine();
+        process.stdout.cursorTo(0);
+        process.stdout.write(data.results[0].alternatives[0].transcript);
+        if (data.results[0].isFinal) process.stdout.write('\n');
+        audioStreamCall.write({
+          transcript: data.results[0].alternatives[0].transcript,
+          isfinal: data.results[0].isFinal
+        });
+      }
+    });
+    audioStreamCall.write({
+      isstatus: "Streaming server successfully started"
+    });
+    restartTimeoutId = setTimeout(restartStreaming, STREAMING_LIMIT);
+}
+
+function doStopAudioStream(call, callback) {
+  clearTimeout(restartTimeoutId);
+  audioStreamCall.end();
+  stopStreaming();
+  callback(null, {message: 'Server has successfully stopped streaming'});
+}
+
+function stopStreaming(){
+  recognizeStream = null;
+}
+
+function restartStreaming(){
+  stopStreaming();
+  startStreaming();
+}
+
 function getServer() {
   var server = new grpc.Server();
-  server.addService(helloworld.Greeter.service, {
-    sayHello: doSayHello,
-    sayRepeatHello: doSayRepeatHello
+  server.addService(cloud_speech_web.Speech.service, {
+    setLanguageCode: doSetLanguageCode,
+    transcribeAudioStream: doTranscribeAudioStream,
+    stopAudioStream: doStopAudioStream
   });
-  console.log("here i am, your server...");
+  console.log("Server Started");
   return server;
 }
 

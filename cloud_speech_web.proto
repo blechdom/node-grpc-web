@@ -1,0 +1,40 @@
+
+syntax = "proto3";
+
+package cloud_speech_web;
+
+service Speech {
+
+  rpc SetLanguageCode (LanguageRequest) returns (LanguageResponse);
+
+  rpc TranscribeAudioStream (AudioStreamRequest) returns (stream AudioStreamResponse);
+
+  rpc StopAudioStream (StopStreamRequest) returns (StopStreamResponse);
+
+}
+
+message LanguageRequest {
+  string languagecode = 1;
+}
+
+message LanguageResponse {
+  string message = 1;
+}
+
+message AudioStreamRequest {
+  bool start = 1;
+}
+
+message AudioStreamResponse {
+  string transcript = 1;
+  bool isfinal = 2;
+  string isstatus = 3;
+}
+
+message StopStreamRequest {
+  bool stop = 1;
+}
+
+message StopStreamResponse {
+  string message = 1;
+}

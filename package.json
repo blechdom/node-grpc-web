@@ -17,6 +17,8 @@
     "build": "rm -rf ./dist && npx webpack client.js"
   },
   "dependencies": {
-    "@google-cloud/speech": "^2.2.0"
+    "@google-cloud/speech": "^2.2.0",
+    "socket.io": "^2.2.0",
+    "socket.io-stream": "^0.9.1"
   }
 }

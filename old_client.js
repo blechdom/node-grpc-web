@@ -6,16 +6,29 @@ window.onload = function(){
   var languageCode = document.getElementById('languageCodeSelect');
   var statusMessages = document.getElementById('statusMessages');
   var protoMessages = document.getElementById('protoMessages');
+  var fileInput = document.getElementById('file-input');
+  var uploadFileButton = document.getElementById('upload-file');
   var langCode = "en-US";
 
-  var socket = io("http://localhost:8082");
 
-  const { LanguageRequest,
+  var socket = io("http://localhost:8082");
+  socket.on("welcome", (message) => {
+      console.log(message);
+  })
+
+
+  fileInput.addEventListener("change", function() {
+      console.log("Language selected: " + fileInput.files[0].name);
+      //langCode = languageCode.value;
+      //socket.emit('languageCode', languageCode.value);
+  });
+
+  const { FileRequest,
+          FileResponse,
+          LanguageRequest,
           LanguageResponse,
           AudioStreamRequest,
           AudioStreamResponse,
-          StopStreamRequest,
-          StopStreamResponse
         } = require('./cloud_speech_web_pb.js');
 
   const {SpeechClient} = require('./cloud_speech_web_grpc_web_pb.js');
@@ -25,19 +38,42 @@ window.onload = function(){
   languageCode.addEventListener("change", function() {
 
       langCode = languageCode.value;
+
       var request = new LanguageRequest();
+
       request.setLanguagecode(langCode);
 
       client.setLanguageCode(request, {}, (err, response) => {
-        protoMessages.innerHTML = '<br>' + response.getMessage() + ' (restart stream to change)';
+        console.log(response.getMessage());
+        protoMessages.append(document.createElement("br"), response.getMessage());
       });
+
   });
+
+  uploadFileButton.onclick = function() {
+
+    statusMessages.innerHTML = "Transcribing...";
+
+    var request = new FileRequest();
+
+    request.setFilepath('./resources/Brooklyn.flac');
+
+    var stream = client.transcribeFile(request, {});
+
+    stream.on('data', (response) => {
+      console.log(response.getMessage());
+      protoMessages.append(document.createElement("br"), response.getMessage());
+    });
+
+  }
 
   startStreamingButton.onclick = function() {
     if(!recordingStatus){
+      console.log("start streaming");
       startStreaming();
     }
     else {
+      console.log("stop streaming");
       stopStreaming();
     }
   }
@@ -58,6 +94,7 @@ window.onload = function(){
 
   function initRecording() {
   	streamStreaming = true;
+    console.log("init recording");
     var request = new AudioStreamRequest();
 
     request.setStart(true);
@@ -65,13 +102,10 @@ window.onload = function(){
     var stream = client.transcribeAudioStream(request, {});
 
     stream.on('data', (response) => {
+      console.log("transcript: " + response.getTranscript() + " isFinal? " + response.getIsfinal());
       currentResult.innerHTML = response.getTranscript();
       if (response.getIsfinal()){
         finalResult.append(document.createElement("br"), response.getTranscript());
-        currentResult.innerHTML = "";
-      }
-      if (response.getIsstatus()){
-        protoMessages.innerHTML = response.getIsstatus();
       }
     });
 
@@ -93,6 +127,7 @@ window.onload = function(){
 
   	navigator.mediaDevices.getUserMedia(constraints)
   		.then(handleSuccess);
+
   }
 
   function microphoneProcess(e) {
@@ -116,7 +151,7 @@ window.onload = function(){
     recordingStatus = false;
     microphoneIcon.removeAttribute("class", "icon-flash");
     microphoneIcon.style.color = "DodgerBlue";
-    statusMessages.innerHTML = "Click on the microphone to begin...";
+    statusMessages.innerHTML = "Select an audio file or click on microphone to begin...";
 
   	let track = globalStream.getTracks()[0];
   	track.stop();
@@ -130,12 +165,12 @@ window.onload = function(){
     		AudioContext = null;
     	});
     }
-    var request = new StopStreamRequest();
+    var request = new AudioStreamRequest();
 
-    request.setStop(true);
+    request.setStart(false);
 
-    client.stopAudioStream(request, {}, (err, response) => {
-      protoMessages.innerHTML = response.getMessage();
+    client.stopStream(request, {}, (err, response) => {
+      console.log(response.getMessage());
     });
   }
 
