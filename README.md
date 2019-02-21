@@ -20,7 +20,7 @@ This [Cloud Speech API](https://cloud.google.com/speech/docs) Tutorial shows you
 1.  [Enable the Google Cloud Speech API API][enable_api].
 
 1.  [Set up authentication with a service account][auth] so you can access the
-    API from your local workstation.
+    API from your local workstation. This may require copying a service JSON file from the GPC credentials page and exorting the GOOGLE_APPLICATION_CREDENTIALS path to the JSON file prior to running the node server.
 
 1.  Clone this Repo.
 
@@ -62,6 +62,8 @@ This [Cloud Speech API](https://cloud.google.com/speech/docs) Tutorial shows you
 
 1.  Go to http://localhost:8081 in your browser window.
 
+![gRPC-web Speech Flowchart Image](gRPC-web-speech-flowchart.png)
+
 ## To edit and test the example app
 
 *   Make sure Docker and Envoy proxy are installed and running
@@ -95,7 +97,7 @@ This [Cloud Speech API](https://cloud.google.com/speech/docs) Tutorial shows you
 [explained]: https://cloud.google.com/apis/docs/client-libraries-explained
 [docker]: https://www.docker.com/products/docker-desktop
 [npm/NodeJS]: https://cloud.google.com/nodejs/docs/setup
-[grpc]:  https://grpc.io/docs/quickstart/go.html
+[grpc]:  https://grpc.io/docs/tutorials/basic/node.html
 [client-docs]: https://cloud.google.com/nodejs/docs/reference/speech/latest/
 [product-docs]: https://cloud.google.com/speech/docs
 [shell_img]: https://gstatic.com/cloudssh/images/open-btn.png
