@@ -66,6 +66,10 @@ This [Cloud Speech API](https://cloud.google.com/speech/docs) Tutorial shows you
 
 ![gRPC-web Speech Flowchart Image](gRPC-web-speech-flowchart.png)
 
+## Troubleshooting
+
+*  Make sure you have a microphone, that is working, and you have allowed the browser to access the Audio Input.
+
 ## To edit and test the example app
 
 *   Make sure Docker and Envoy proxy are installed and running
